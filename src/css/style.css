@@ -1,0 +1,171 @@
+.my-container {
+    width: 60%;
+}
+
+@import url(https://fonts.googleapis.com/css?family=Lato:900);
+*, *:before, *:after{
+  box-sizing:border-box;
+}
+body {
+  font-family: 'Lato', sans-serif;
+  background-image: url("/img/background-web.jpg");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+
+input[type='radio'] li {
+  margin: 10px 2px 10px 2px;
+}
+
+input[type='submit'] {
+  margin-top: 10px;
+}
+
+.mybtn {
+    margin: 20px 0px 20px 0px;
+    height: 100px;
+    width: 300px;
+    line-height: 100px;
+    text-align: center;
+    border-style: dashed;
+    border-width: 2px;
+    border-radius: 50px;
+    border-color: #64606041;
+    padding: 0px 0px 0px 0px;
+}
+
+.mytext {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+    font-weight: 900;
+    font-size: 2em;
+    color: rgba(75, 11, 69, 0.527);
+    transform-style: preserve-3d;
+}
+
+div.foo{
+  width: 90%;
+  margin: 0 auto;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.letter{
+  display: inline-block;
+  font-weight: 900;
+  font-size: 8em;
+  margin: 0.00em;
+  position: relative;
+  color: #00B4F1;
+  transform-style: preserve-3d;
+  perspective: 400;
+  z-index: 1;
+}
+.letter:before, .letter:after{
+  position:absolute;
+  content: attr(data-letter);
+  transform-origin: top left;
+  top:0;
+  left:0;
+}
+.letter, .letter:before, .letter:after{
+  transition: all 0.3s ease-in-out;
+}
+.letter:before{
+  color: #fff;
+  text-shadow: 
+    -1px 0px 1px rgba(255,255,255,.8),
+    1px 0px 1px rgba(0,0,0,.8);
+  z-index: 3;
+  transform:
+    rotateX(0deg)
+    rotateY(-15deg)
+    rotateZ(0deg);
+}
+.letter:after{
+  color: rgba(0,0,0,.11);
+  z-index:2;
+  transform:
+    scale(1.08,1)
+    rotateX(0deg)
+    rotateY(0deg)
+    rotateZ(0deg)
+    skew(0deg,1deg);
+}
+
+
+.letter:hover:before{
+  color: #fafafa;
+  transform:
+    rotateX(0deg)
+    rotateY(-40deg)
+    rotateZ(0deg);
+}
+.letter:hover:after{
+  transform:
+    scale(1.08,1)
+    rotateX(0deg)
+    rotateY(40deg)
+    rotateZ(0deg)
+    skew(0deg,22deg);
+}
+
+.verticalline {
+  border-right:  solid #e67575;
+}
+
+.side-bar {
+  text-align: right;
+}
+
+h1, h2, h3 {
+  color: rgba(0, 181, 241, 0.3);
+}
+
+.outer-btn {
+  display: table; 
+  margin: 0 auto;
+}
+
+.main-view {
+  display: table; 
+  margin: 0 auto;
+}
+
+.viewbtn {
+  display: block;
+  margin: 0 auto;
+}
+
+.elector .selection {
+  margin-bottom: 1em;
+}
+
+.elector .selection label {
+  display: inline-block;
+  width:8em;
+  height:4em;
+  line-height: 3em;
+  text-align: center;
+  background-color: #42b4d6;
+  border-radius: 6px;
+  color: #ffffff;
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+.elector .selection label:hover {
+  background-color: #5fc0dc;
+}
+
+.elector .selection input[type=radio] {
+  display: none;
+}
+
+.elector .selection input[type=radio]:checked ~ label {
+  background-color: #f1592a;
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+        <title> VOSYS - Voting system</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <link rel= "stylesheet" type= "text/css" href= "css/style.css">
+        <script type="text/javascript" src="js/app.js"></script>
+        <script type="text/javascript" src="js/app1.js"></script>
+    </head>
+    <body>
+        <div class="foo"> 
+            <span class="letter" data-letter="VO"> VO </span>
+            <span class="letter" data-letter="SYS"> SYS </span>
+            <h2>Vote your state's elector</h2>
+            User address: <i><span id="account"></span></i><br>
+            Status: <span id="status"></span>
+        </div>
+        <div class = "container-fluid my-container">
+            <span class="round1end" hidden> <div class="foo"><h1> Elector round ended ! </h1></div></span>
+            <div class="round1start" class="row"> 
+                <div class="col-xs-3 side-bar verticalline">
+                    <ul style="list-style: none">
+                        <li><a href="#"><span id="regis">Register </span></a></li>
+                        <li><a href="#"><span id="info"> Informations </span></a></li>
+                        <li><a href="#"><span id="vote"> Vote </span></a></li>
+                    </ul>
+                </div>
+                <div class="col-xs-6 ">
+                    <div class = "main-view">
+                    <i>Voteground for round 1 here</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
