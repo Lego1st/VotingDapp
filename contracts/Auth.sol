@@ -63,7 +63,7 @@ contract Ballot {
     address public votePollCreater;
 
     string[] public votePollNames;
-    mapping (string => VotePoll) votePollMap;
+    mapping (string => VotePoll) public votePollMap;
 
     function Ballot() public {
         votePollCreater = msg.sender;
@@ -161,14 +161,13 @@ contract Ballot {
         // Check if this user has voted.
         bool hasVoted = (votePollMap[pollName].voted[msg.sender] != address(0));
 
-        // If voted then decrease voteCount of previously voted proposal.
-        if (hasVoted) {
-            address previousProposalID = votePollMap[pollName].voted[msg.sender];
-            votePollMap[pollName].proposalMap[previousProposalID].voteCount -= 1;
-        }
+        // Doesn't allow re-vote.
+        require(hasVoted == false);
 
         // Increase voteCount of the proposal that this user chosed to vote for.
         votePollMap[pollName].proposalMap[proposalID].voteCount += 1;
+        // Save which proposal this user voted for.
+        votePollMap[pollName].voted[msg.sender] = proposalID;
     }   
 
     function end(string pollName) public hasThisPollName(pollName) pollHasNotEnded(pollName) callerIsPollCreater {
@@ -257,4 +256,37 @@ contract Ballot {
         return proposal.infoMap[infoKey];
     }
     // End get Ballot info.
+}
+
+contract FinalBallot is Ballot {
+    struct Voter {
+        address id;
+        string name;
+        mapping (string => string) infoMap;
+    }
+
+    address[] voterAddresses;
+    mapping (address => Voter) voterMap;
+    address firstBallotAddress;
+    Ballot firstBallot;
+
+    modifier hasFirstBallotAddress() {
+        require(firstBallotAddress != address(0));
+        _;
+    }
+
+    function setFirstBallotAddress(address ballotAddress) public {
+        firstBallotAddress = ballotAddress;
+        firstBallot = Ballot(firstBallotAddress);
+    }
+
+    function start() public hasFirstBallotAddress {
+        // Get result from first ballot.
+        // Get number of vote poll.
+        uint pollCount = firstBallot.getVotePollsCount();
+
+        for(uint i = 0; i < pollCount; i++) {
+            
+        }
+    }
 }
