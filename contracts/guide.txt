@@ -1,0 +1,51 @@
+Votepoll được quản lý = name.
+Proposal được quản lý bởi address.
+
+Ballot
+    Chỉ lưu thông tin về vote poll và address của proposal.
+
+    name: poll name
+    proposals: Danh sách các proposal có trong poll này.
+    hasRightToVote: Mappping quản lý xem một address nhất định có quyền vote trong poll này không.
+    hasVoted: Mapping quản lý xem address đã vote chưa.
+    voteCount: mapping lưu số vote của các proposal.
+    winnersCount: uint quản lý số người thắng. Sau khi votePoll end thì sẽ chọn ra $winnersCount người thắng vào vòng sau.
+
+    constructor: cho phép set owner. Chỉ address của owner mới có thể thay đổi state của Ballot.
+    
+    setAuth: Set địa chỉ của Auth để Auth có thể giveRightToVote.
+
+    Các hàm để tạo votePoll:
+        addVotePoll(name): thêm votepoll với tên là name
+
+        addProposalToVotePoll(name, proposal): thêm proposal vào votepoll name.
+
+    Các hàm để quản lý việc vote:
+        giveRightToVote(pollname, voter): cho phép voter vote vào pollName. Chỉ có thể được gọi bởi Auth.
+
+        vote(pollName, proposal): voter sẽ trực tiếp gọi hàm này để vote vào pollName cho proposal.
+    
+    Các hàm quản lý việc kết thúc votePoll:
+        endPoll(pollName): kết thúc votePoll này. Một poll khi đã kết thúc sẽ không thể vote/giveRight nữa.
+    
+    Các hàm lấy thông tin về votePoll và proposal:
+        getVotePollCount: lấy số lượng votePoll hiện có.
+
+        getVotePollInfo(idx): lấy thông tin của votePoll có index = idx. Thông tin bao gồm: name - tên, proposalCount - số lượng proposal trong votePoll và ended - đã kết thúc hay chưa.
+
+        getVotePollProposalInfo(pollIdx, proposalIdx): lấy thông tin về proposal trong một votePoll. Thông tin trả ra là address của proposal và voteCount của proposal đó.
+    
+    Các hàm kiểm tra về việc vote của người dùng:
+        hasVoteRight(pollName): check xem người dùng có quyền vote vào poll này không.
+        hasVoted(pollName): check xem người dùng đã vote vào poll này chưa.
+    
+    Các bước để bắt đầu vòng vote 2:
+        End hết các vòng vote cũ. (hiện tại đang để cho front end tự gọi, nếu cần có thể sửa code để gọi lúc startSecondBallot).
+
+        startSecondBallot: tạo votePoll cho vòng 2 (tên là "final" và có winnersCount = 1) và lấy $winnersCount proposal có số vote cao nhất trong mỗi votePoll vòng 1 để cấp quyền được vote trong poll cuối này.
+
+        Sau đó thì sửa poll cuối này như các poll khác, cụ thể:
+        
+        Thêm các proposal cho votePoll cuối (dùng hàm addProposalToVotePoll với pollName là "final")
+
+        Sau khi poll kết thúc, gọi end với pollName = 'final' và lấy kết quả trong getVotePollInfo.

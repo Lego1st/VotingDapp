@@ -1,14 +1,14 @@
-pragma solidity 0.4.21;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.4.23;
+// pragma experimental ABIEncoderV2;
 
 contract Authorize {
-    mapping (address => string) private registeredAddress;
+    mapping (address => bytes32) private registeredAddress;
     address public creator;
     address public ballotAddress;
     Ballot ballot;
     uint EXPECTED_ID_LENGTH = 9;
 
-    function Authorize() public {
+    constructor() public {
         creator = msg.sender;
     }
 
@@ -24,269 +24,188 @@ contract Authorize {
         ballot = Ballot(ballotAddress);
     }
 
-    function register(string ID, string state) public ballotAddressIsSet {
+    function register(bytes32 ID, bytes32 state) public ballotAddressIsSet {
         // Check for ID length.
-        require(bytes(ID).length == EXPECTED_ID_LENGTH);
+        // require(bytes(ID).length == EXPECTED_ID_LENGTH);
         // Check to make sure this address has not reg any ID.
-        require(bytes(registeredAddress[msg.sender]).length == 0);
+        // require(bytes(registeredAddress[msg.sender]).length == 0);
 
         registeredAddress[msg.sender] = ID;
         ballot.giveRightToVote(state, msg.sender);
     }
     
-    function getRegisteredID() public view returns (string) {
+    function getRegisteredID() public view returns (bytes32) {
         return registeredAddress[msg.sender];
     }
 }
 
 contract Ballot {
-    struct Proposal {
-        string name;
-        address id;
-        uint voteCount;
-        string[] infoKeys;
-        mapping (string => string) infoMap;
-    }
-
     struct VotePoll {
-        string name;
-        uint winnersCount;
-        address[] winnersList;
+        // Poll name
+        bytes32 name;
+        // Danh sách các proposal có trong poll này.
+        address[] proposals;
+        // Mappping quản lý xem một address nhất định có quyền vote trong poll này không.
+        mapping(address => bool) hasRightToVote;
+        // Mapping quản lý xem address đã vote chưa.
+        mapping(address => bool) hasVoted;
+        // Mapping lưu số vote của các proposal.
+        mapping(address => uint) voteCount;
+        // Bool quản lý xem poll đã được kết thúc chưa.
         bool ended;
-        address[] proposalIDs;
-        mapping (address => Proposal) proposalMap;
-        mapping (address => bool) canVote;
-        mapping (address => address) voted;
+        // Uint quản lý số người thắng.
+        uint winnersCount;
     }
 
-    address public authAddress;
-    address public votePollCreater;
+    bytes32 SECOND_BALLOT_POLL_NAME = "final";
 
-    string[] public votePollNames;
-    mapping (string => VotePoll) public votePollMap;
+    address public owner;
+    address public auth;
+    
+    bytes32[] public votePollName;
+    mapping(bytes32 => VotePoll) public votePollMap;
 
-    function Ballot() public {
-        votePollCreater = msg.sender;
-    }
-
-    function setAuthAddress(address adr) public callerIsPollCreater {
-        authAddress = adr;
-    }
-
-    // Modifiers.
-    modifier authorizeAddressIsSet() {
-        require(authAddress != address(0));
+    modifier isOwner() {
+        require(msg.sender == owner);
         _;
     }
 
-    modifier callerIsAuthorize() {
-        require(msg.sender == authAddress);
-        _;
-    }
-
-    modifier callerIsPollCreater() {
-        require(msg.sender == votePollCreater);
-        _;
-    }
-
-    modifier hasThisPollName(string pollName) {
-        // Check if we have a VotePoll with this name.
-        bool hasThisName = false;
-        for(uint i = 0; i < votePollNames.length; i++) {
-            if (keccak256(pollName) == keccak256(votePollNames[i])) {
-                hasThisName = true;
+    modifier hasThisPollName(bytes32 pollName) {
+        bool found = false;
+        for(uint i = 0; i < votePollName.length; i++) {
+            if (keccak256(votePollName[i]) == keccak256(pollName)) {
+                found = true;
                 break;
             }
         }
 
-        require(hasThisName);
+        require(found == true);
         _;
     }
 
-    modifier hasThisProposalID(string pollName, address proposalID) {
-        // Check if we have this proposalID in pollName.
-        bool hasThisID = false;
-        for(uint i = 0; i < votePollMap[pollName].proposalIDs.length; i++) {
-            if(proposalID == votePollMap[pollName].proposalIDs[i]) {
-                hasThisID = true;
+    modifier hasThisProposal(bytes32 pollName, address proposal) {
+        bool found = false;
+        for(uint i = 0; i < votePollName.length; i++) {
+            if (votePollMap[pollName].proposals[i] == proposal) {
+                found = true;
                 break;
             }
         }
 
-        require(hasThisID);
+        require(found == true);
         _;
     }
 
-    modifier hasVoteRight(string pollName) {
-        require(votePollMap[pollName].canVote[msg.sender]);
+    modifier isAuth() {
+        require(msg.sender == auth);
         _;
     }
 
-    modifier pollHasNotEnded(string pollName) {
+    modifier canVote(bytes32 pollName) {
+        require(votePollMap[pollName].hasRightToVote[msg.sender] == true);
+        _;
+    }
+
+    modifier pollNotEnded(bytes32 pollName) {
         require(votePollMap[pollName].ended == false);
         _;
     }
-    // End modifiers.
-
-
-    function giveRightToVote(string pollName, address voterAddress) public authorizeAddressIsSet callerIsAuthorize hasThisPollName(pollName) pollHasNotEnded(pollName) {
-        // TODO: allow pollCreater to giveRightToVote.
-
-        votePollMap[pollName].canVote[voterAddress] = true;
+    
+    constructor(address _owner) public {
+        owner = _owner;
     }
 
-
-    // Add VotePolls information for Ballot.
-    function addVotePoll(string pollName, uint winnersCount) public callerIsPollCreater pollHasNotEnded(pollName) {
-        // TODO: add check if pollName already exist.
-
-        votePollNames.push(pollName);
-        votePollMap[pollName] = VotePoll({name: pollName, ended: false, winnersCount: winnersCount, winnersList: new address[](0), proposalIDs: new address[](0)});
+    // Set địa chỉ của Auth để Auth có thể giveRightToVote.
+    function setAuth(address _auth) public {
+        auth = _auth;
     }
 
-    function addProposalToVotePoll(string pollName, string proposalName, address proposalID) public hasThisPollName(pollName) callerIsPollCreater pollHasNotEnded(pollName) {
-        votePollMap[pollName].proposalIDs.push(proposalID);
-        votePollMap[pollName].proposalMap[proposalID] = Proposal({name: proposalName, id: proposalID, voteCount: 0, infoKeys: new string[](0)});
+    function addVotePoll(bytes32 pollName, uint winnersCount) isOwner public {
+        // Kiểm tra xem tên này đã dùng chưa.
+        for(uint i = 0; i < votePollName.length; i++) {
+            if (keccak256(votePollName[i]) == keccak256(pollName))
+                return;
+        }
+
+        votePollName.push(pollName);
+        votePollMap[pollName] = VotePoll({name: pollName, proposals: new address[](0), ended: false, winnersCount: winnersCount});
     }
 
-    function addAdditionalInfoToProposal(string pollName, address proposalID, string infoKey, string infoValue) public hasThisPollName(pollName) hasThisProposalID(pollName, proposalID) callerIsPollCreater pollHasNotEnded(pollName) {
-        // TODO: allow candidate to add their info.
-
-        votePollMap[pollName].proposalMap[proposalID].infoKeys.push(infoKey);
-        votePollMap[pollName].proposalMap[proposalID].infoMap[infoKey] = infoValue;
+    function addProposalToVotePoll(bytes32 pollName, address proposalAddress) isOwner hasThisPollName(pollName) public {
+        // Kiểm tra xem address này đã được add chưa.
+        for(uint i = 0; i < votePollMap[pollName].proposals.length; i++) {
+            if (votePollMap[pollName].proposals[i] == proposalAddress)
+                return;
+        }
+                
+        votePollMap[pollName].proposals.push(proposalAddress);
     }
-    // End add information methods.
 
-    function vote(string pollName, address proposalID) public hasThisPollName(pollName) hasThisProposalID(pollName, proposalID) hasVoteRight(pollName) pollHasNotEnded(pollName) {
-        // Check if this user has voted.
-        bool hasVoted = (votePollMap[pollName].voted[msg.sender] != address(0));
+    function giveRightToVote(bytes32 pollName, address voter) isAuth hasThisPollName(pollName) pollNotEnded(pollName) public {
+        votePollMap[pollName].hasRightToVote[voter] = true;
+    }    
 
-        // Doesn't allow re-vote.
-        require(hasVoted == false);
+    function vote(bytes32 pollName, address proposal) hasThisPollName(pollName) 
+    hasThisProposal(pollName, proposal) canVote(pollName) pollNotEnded(pollName) public {
+        votePollMap[pollName].hasVoted[msg.sender] = true;
+        votePollMap[pollName].voteCount[proposal] += 1;
+    }  
 
-        // Increase voteCount of the proposal that this user chosed to vote for.
-        votePollMap[pollName].proposalMap[proposalID].voteCount += 1;
-        // Save which proposal this user voted for.
-        votePollMap[pollName].voted[msg.sender] = proposalID;
-    }   
+    function endPoll(bytes32 pollName) isOwner hasThisPollName(pollName) public {
+        votePollMap[pollName].ended = true;
+    }
 
-    function end(string pollName) public hasThisPollName(pollName) pollHasNotEnded(pollName) callerIsPollCreater {
-        // End this poll.
-        votePollMap[pollName].ended = false;
+    function getVotePollCount() public view returns(uint) {
+        return votePollName.length;
+    }
 
-        // Calculate result for this poll.
-        // First sort the result.
-        // TODO: partial sort to sort only the ${winnersCount} highest proposal.
-        for(uint i = votePollMap[pollName].proposalIDs.length; i > 0; i--) {
-            uint bestProposal = 0;
-            for(uint j = 0; j < i; j++) {
-                if (votePollMap[pollName].proposalMap[votePollMap[pollName].proposalIDs[bestProposal]].voteCount < votePollMap[pollName].proposalMap[votePollMap[pollName].proposalIDs[j]].voteCount)
-                    bestProposal = j;
+    function getVotePollInfo(uint idx) public view returns(bytes32 name, uint proposalCount, bool ended) {
+        require(idx < votePollName.length);
+
+        VotePoll poll = votePollMap[votePollName[idx]];
+        return(poll.name, poll.proposals.length, poll.ended);
+    }
+
+    function getVotePollProposalInfo(uint votePollIdx, uint proposalIdx) public view returns (address proposal, uint voteCount) {
+        require(votePollIdx < votePollName.length);
+
+        VotePoll poll = votePollMap[votePollName[votePollIdx]];
+        require(proposalIdx < poll.proposals.length);
+
+        address adr = poll.proposals[proposalIdx];
+        return(adr, poll.voteCount[adr]);
+    }
+
+    function hasVoteRight(bytes32 pollName) hasThisPollName(pollName) public view returns(bool) {
+        return votePollMap[pollName].hasRightToVote[msg.sender];
+    }
+
+    function hasVoted(bytes32 pollName) hasThisPollName(pollName) public view returns(bool) {
+        return votePollMap[pollName].hasVoted[msg.sender];
+    }
+
+    function startSecondBallot() isOwner public {
+        addVotePoll(SECOND_BALLOT_POLL_NAME, 1);
+
+        // Cấp quyền cho các candidate thắng ở vòng 1.
+        for(uint pollIdx = 0; pollIdx < votePollName.length; pollIdx++) {
+            VotePoll poll = votePollMap[votePollName[pollIdx]];
+            for(uint i = 0; i < poll.proposals.length; i++) {
+                uint bestIdx = 0;
+                for(uint j = i; j < poll.proposals.length; j++) {
+                    if(poll.voteCount[poll.proposals[bestIdx]] < poll.voteCount[poll.proposals[j]])
+                        bestIdx = j;
+                }
+
+                // Cho phép candidate này vote trong vòng cuối.
+                giveRightToVote(SECOND_BALLOT_POLL_NAME, poll.proposals[bestIdx]);
+
+                // Đổi chỗ candidate này lên đầu. 
+                address tmp = poll.proposals[bestIdx];
+                poll.proposals[bestIdx] = poll.proposals[i];
+                poll.proposals[i] = tmp;
             }
-
-            address tmp = votePollMap[pollName].proposalIDs[i];
-            votePollMap[pollName].proposalIDs[i] = votePollMap[pollName].proposalIDs[bestProposal];
-            votePollMap[pollName].proposalIDs[bestProposal] = tmp;
-        }
-
-        // Get ${winnersCount} highest proposal to be the winners.
-        uint proposalsCount = votePollMap[pollName].proposalIDs.length;
-        for(uint k = 0; k < votePollMap[pollName].winnersCount; k++) {
-            votePollMap[pollName].winnersList.push(votePollMap[pollName].proposalIDs[proposalsCount - k - 1]);
-        }
-    }           
-
-
-    // Get info from Ballot.
-    function getVotePollsCount() public view returns (uint) {
-        return votePollNames.length;
-    }
-
-    function getVotePollInfo(uint pollIdx) public view returns (string name, uint winnersCount, bool ended, uint proposalsCount) {
-        require(pollIdx < votePollNames.length);
-
-        VotePoll poll = votePollMap[votePollNames[pollIdx]];
-        return(poll.name, poll.winnersCount, poll.ended, poll.proposalIDs.length);
-    }
-
-    function getWinner(uint pollIdx, uint winnerIdx) public view returns (address winnerAddress) {
-        require(pollIdx < votePollNames.length);
-        require(winnerIdx < votePollMap[votePollNames[pollIdx]].winnersCount);
-
-        VotePoll poll = votePollMap[votePollNames[pollIdx]];
-        return poll.winnersList[winnerIdx];
-    }
-
-    function checkIfUserCanVote(string pollName) public view hasThisPollName(pollName) returns (bool) {
-        return votePollMap[pollName].canVote[msg.sender];
-    }
-
-    function checkIfUserHasVoted(string pollName) public view hasThisPollName(pollName) hasVoteRight(pollName) returns (bool) {
-        return (votePollMap[pollName].voted[msg.sender] != address(0));
-    }
-
-    function getUserVotedProposal(string pollName) public view hasThisPollName(pollName) hasVoteRight(pollName) returns (address) {
-        return votePollMap[pollName].voted[msg.sender];
-    }
-
-    function getProposalsCount(uint pollIdx) public view returns (uint) {
-        require(pollIdx < votePollNames.length);
-
-        return votePollMap[votePollNames[pollIdx]].proposalIDs.length;
-    }
-
-    function getProposalsInfo(uint pollIdx, uint proposalIdx) public view returns (string name, address id, uint voteCount, uint infoKeysCount) {
-        require(pollIdx < votePollNames.length);
-        require(proposalIdx < votePollMap[votePollNames[pollIdx]].proposalIDs.length);
-
-        address proposalID = votePollMap[votePollNames[pollIdx]].proposalIDs[proposalIdx];
-        Proposal proposal = votePollMap[votePollNames[pollIdx]].proposalMap[proposalID];
-        return (proposal.name, proposal.id, proposal.voteCount, proposal.infoKeys.length);
-    }
-
-    function getProposalInfoKey(uint pollIdx, uint proposalIdx, uint infoKeyIdx) public view returns (string infoValue) {
-        require(pollIdx < votePollNames.length);
-        require(proposalIdx < votePollMap[votePollNames[pollIdx]].proposalIDs.length);
-
-        address proposalID = votePollMap[votePollNames[pollIdx]].proposalIDs[proposalIdx];
-        Proposal proposal = votePollMap[votePollNames[pollIdx]].proposalMap[proposalID];
-        require(infoKeyIdx < proposal.infoKeys.length);
-
-        string infoKey = proposal.infoKeys[infoKeyIdx];
-        return proposal.infoMap[infoKey];
-    }
-    // End get Ballot info.
-}
-
-contract FinalBallot is Ballot {
-    struct Voter {
-        address id;
-        string name;
-        mapping (string => string) infoMap;
-    }
-
-    address[] voterAddresses;
-    mapping (address => Voter) voterMap;
-    address firstBallotAddress;
-    Ballot firstBallot;
-
-    modifier hasFirstBallotAddress() {
-        require(firstBallotAddress != address(0));
-        _;
-    }
-
-    function setFirstBallotAddress(address ballotAddress) public {
-        firstBallotAddress = ballotAddress;
-        firstBallot = Ballot(firstBallotAddress);
-    }
-
-    function start() public hasFirstBallotAddress {
-        // Get result from first ballot.
-        // Get number of vote poll.
-        uint pollCount = firstBallot.getVotePollsCount();
-
-        for(uint i = 0; i < pollCount; i++) {
-            
         }
     }
-}
+}   
+
