@@ -23,7 +23,7 @@ response = requests.post(server_url+'create_poll/', data=poll_data)
 proposal_data = {
     'address': '0x18f624Fd1b9e8a9294C20d19489020FfF51768D3'
     'name': 'Donald Trump',
-    'date_of_birth': 'Jun/14/1946'
+    'date_of_birth': '07/14/1946'
 }
 response = requests.post(server_url+'create_proposal/', data=proposal_data)
 ```
