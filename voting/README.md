@@ -38,15 +38,16 @@ response = requests.post(server_url+'create_proposal/', data=proposal_data)
 <server url>/get_list_proposals/
 ```
 **create_proposal**
+
 Parameters:
-- address: str (required). The address of the proposal.
-- poll_name: str (not required). The name of the poll this proposal belong to.
-- name: str (required). The name of the proposal.
-- support_address: str (not required). The address of the president candidate this proposal support for (null if this proposal is a president candidate).
-- avatar: str (not required). The image path to the avatar image of this proposal.
-- description: str (not required).
-- date_of_birth: str (not required). In the format of mm/dd/yyy, ex: 01/11/1971
-- party: str (not required). The party this proposal belong to.
+- `address`: str (required). The address of the proposal.
+- `poll_name`: str (not required). The name of the poll this proposal belong to.
+- `name`: str (required). The name of the proposal.
+- `support_address`: str (not required). The address of the president candidate this proposal support for (null if this proposal is a president candidate).
+- `avatar`: str (not required). The image path to the avatar image of this proposal.
+- `description`: str (not required).
+- `date_of_birth`: str (not required). In the format of mm/dd/yyy, ex: 01/11/1971
+- `party`: str (not required). The party this proposal belong to.
 
 Return:
 - response.status_code == 400 if Missing required field/Wrong date format/Proposal's address existed.
@@ -55,10 +56,11 @@ Return:
 - response.status_code == 200, Proposal created.
 
 **create_poll**
+
 Parameters:
-- name: str (required). The nickname of the poll.
-- description: str (not required).
-- display_name: str (not required). The full name of the poll. if not provdided display_name = name.
+- `name`: str (required). The nickname of the poll.
+- `description`: str (not required).
+- `display_name`: str (not required). The full name of the poll. if not provdided display_name = name.
 
 Return:
 - response.status_code == 400 if Missing required field/Poll's name existed.
@@ -66,8 +68,9 @@ Return:
 - response.status_code == 200, Poll created.
 
 **get_proposal**
+
 Parameters:
-- address: str (required). The address of the proposal.
+- `address`: str (required). The address of the proposal.
 
 Return:
 - response.status_code == 400 if Missing required field
@@ -75,8 +78,9 @@ Return:
 - response.status_code == 200 with a json object.
 
 **get_poll**
+
 Parameters:
-- name: str (required). The address of the poll.
+- `name`: str (required). The address of the poll.
 
 Return:
 - response.status_code == 400 if Missing required field
@@ -84,15 +88,16 @@ Return:
 - response.status_code == 200 with a json object.
 
 **update_proposal**
+
 Parameters:
-- address: str (required). The address of the proposal.
-- poll_name: str (not required). The name of the poll this proposal belong to.
-- name: str (required). The name of the proposal.
-- support_address: str (not required). The address of the president candidate this proposal support for (null if this proposal is a president candidate).
-- avatar: str (not required). The image path to the avatar image of this proposal.
-- description: str (not required).
-- date_of_birth: str (not required). In the format of mm/dd/yyy, ex: 01/11/1971
-- party: str (not required). The party this proposal belong to.
+- `address`: str (required). The address of the proposal.
+- `poll_name`: str (not required). The name of the poll this proposal belong to.
+- `name`: str (required). The name of the proposal.
+- `support_address`: str (not required). The address of the president candidate this proposal support for (null if this proposal is a president candidate).
+- `avatar`: str (not required). The image path to the avatar image of this proposal.
+- `description`: str (not required).
+- `date_of_birth`: str (not required). In the format of mm/dd/yyy, ex: 01/11/1971
+- `party`: str (not required). The party this proposal belong to.
 
 Return:
 - response.status_code == 400 if Missing required field/Wrong date format/Proposal's address existed.
@@ -101,10 +106,11 @@ Return:
 - response.status_code == 200, Proposal updated.
 
 **update_poll**
+
 Parameters:
-- name: str (required). The nickname of the poll.
-- description: str (not required).
-- display_name: str (not required). The full name of the poll. if not provdided display_name = name.
+- `name`: str (required). The nickname of the poll.
+- `description`: str (not required).
+- `display_name`: str (not required). The full name of the poll. if not provdided display_name = name.
 
 Return:
 - response.status_code == 400 if Missing required field.
@@ -113,8 +119,9 @@ Return:
 - response.status_code == 200, Poll updated.
 
 **get_list_proposals**
+
 Parameters:
-- poll_name: str (required). The address of the poll.
+- `poll_name`: str (required). The address of the poll.
 
 Return:
 - response.status_code == 400 if Missing required field
