@@ -1,10 +1,15 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, HttpResponseServerError, FileResponse, HttpResponseNotFound
 from .models import *
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
+from django import forms
 
 # Create your views here.
+
+class ImageUploadForm(forms.Form):
+    image = forms.ImageField()
+
 @csrf_exempt
 def create_poll(request):
 
@@ -13,16 +18,16 @@ def create_poll(request):
     display_name = request.POST.get('display_name', name)
     
     if(name == None):
-        return HttpResponseBadRequest("Missing name field")
+        return HttpResponseBadRequest("Missing name field", content_type='text/plain')
 
     if(Poll.objects.filter(pk=name).count() > 0):
-        return HttpResponseBadRequest("Poll's name already exists")
+        return HttpResponseBadRequest("Poll's name already exists", content_type='text/plain')
     else:
         try:
             Poll.objects.create(name=name, description=description, display_name=display_name)
-            return HttpResponse('Poll created: {}'.format(name))
+            return HttpResponse('Poll created: {}'.format(name), content_type='text/plain')
         except e:
-            return HttpResponseServerError('Cannot create new poll')
+            return HttpResponseServerError('Cannot create new poll', content_type='text/plain')
 
 @csrf_exempt
 def create_proposal(request):
@@ -35,11 +40,18 @@ def create_proposal(request):
     description = request.POST.get('description')
     date_of_birth = request.POST.get('date_of_birth')
     party = request.POST.get('party')
+    image = None
+    form = ImageUploadForm(request.POST, request.FILES)
+    if form.is_valid():
+        image = form.cleaned_data['image']
+    else:
+        HttpResponseBadRequest("image fail")
+
     
     if(address == None):
-        return HttpResponseBadRequest("Missing address field")
+        return HttpResponseBadRequest("Missing address field", content_type='text/plain')
     if(name == None):
-        return HttpResponseBadRequest("Missing name field")
+        return HttpResponseBadRequest("Missing name field", content_type='text/plain')
     
     if(poll_name != None):
         poll = get_object_or_404(Poll, pk=poll_name)
@@ -54,23 +66,23 @@ def create_proposal(request):
         try:
             date_of_birth = datetime.strptime(date_of_birth, '%m/%d/%Y')
         except ValueError:
-            return HttpResponseBadRequest("Wrong date format")
+            return HttpResponseBadRequest("Wrong date format", content_type='text/plain')
 
     if(Proposal.objects.filter(pk=address).count() > 0):
-        return HttpResponseBadRequest("Proposal's address already exists")
+        return HttpResponseBadRequest("Proposal's address already exists", content_type='text/plain')
     else:
         try:
-            Proposal.objects.create(address=address, name=name, poll=poll, supportFor=support_for, avatar=avatar, description=description, date_of_birth=date_of_birth, party=party)
-            return HttpResponse("Created proposal: {}".format(address))
+            Proposal.objects.create(address=address, name=name, poll=poll, supportFor=support_for, avatar=avatar, description=description, date_of_birth=date_of_birth, party=party, image=image)
+            return HttpResponse("Created proposal: {}".format(address), content_type='text/plain')
         except e:
-            return HttpResponseServerError('Cannot create new proposal')
+            return HttpResponseServerError('Cannot create new proposal', content_type='text/plain')
 
 @csrf_exempt
 def get_proposal(request):
 
     address = request.POST.get('address')
     if(address == None):
-        return HttpResponseBadRequest("Missing address")
+        return HttpResponseBadRequest("Missing address", content_type='text/plain')
     
     proposal = get_object_or_404(Proposal, pk=address)
     return JsonResponse(proposal.to_json())
@@ -80,7 +92,7 @@ def get_poll(request):
 
     name = request.POST.get('name')
     if(name == None):
-        return HttpResponseBadRequest("Missing name")
+        return HttpResponseBadRequest("Missing name", content_type='text/plain')
 
     poll = get_object_or_404(Poll, pk=name)
     return JsonResponse(poll.to_json())
@@ -96,11 +108,10 @@ def update_proposal(request):
     description = request.POST.get('description')
     date_of_birth = request.POST.get('date_of_birth')
     party = request.POST.get('party')
+
     
     if(address == None):
-        return HttpResponseBadRequest("Missing address field")
-    if(name == None):
-        return HttpResponseBadRequest("Missing name field")
+        return HttpResponseBadRequest("Missing address field", content_type='text/plain')
     
     if(poll_name != None):
         poll = get_object_or_404(Poll, pk=poll_name)
@@ -115,14 +126,25 @@ def update_proposal(request):
         try:
             date_of_birth = datetime.strptime(date_of_birth, '%m/%d/%Y')
         except ValueError:
-            return HttpResponseBadRequest("Wrong date format")
+            return HttpResponseBadRequest("Wrong date format", content_type='text/plain')
     
-    proposal = Proposal.objects.filter(pk=address)
-    if(proposal.count() == 0):
-        return HttpResponseBadRequest("Proposal doesn't exist")
-
-    proposal.update(name=name, poll=poll, supportFor=support_for, avatar=avatar, description=description, date_of_birth=date_of_birth, party=party)
-    return HttpResponse("Updated proposal {}".format(address))
+    proposal = get_object_or_404(Proposal, pk=address)
+    
+    if(name != None):
+        proposal.name = name
+    if(poll != None):
+        proposal.poll = poll
+    if(support_for != None):
+        proposal.supportFor = support_for
+    if(description != None):
+        proposal.description = description
+    if(date_of_birth != None):
+        proposal.date_of_birth = date_of_birth
+    if(party != None):
+        proposal.party = party
+    proposal.save()
+    
+    return HttpResponse("Updated proposal {}".format(address), content_type='text/plain')
 
 @csrf_exempt
 def update_poll(request):
@@ -132,21 +154,22 @@ def update_poll(request):
     display_name = request.POST.get('display_name', name)
     
     if(name == None):
-        return HttpResponseBadRequest("Missing name field")
+        return HttpResponseBadRequest("Missing name field", content_type='text/plain')
 
-    poll = Poll.objects.filter(pk=name)
-    if(poll.count() == 0):
-        return HttpResponseBadRequest("Poll doesn't exist")
-
-    poll.update(description=description, display_name=display_name)
-    return HttpResponse("Updated poll {}".format(name))
+    poll = get_object_or_404(Poll, pk=name)
+    if(description != None):
+        poll.description = description
+    if(display_name != None):
+        poll.display_name = display_name
+    poll.save()
+    return HttpResponse("Updated poll {}".format(name), content_type='text/plain')
 
 @csrf_exempt
 def get_list_proposals(request):
 
     poll_name = request.POST.get('poll_name')
     if(poll_name == None):
-        return HttpResponseBadRequest("Missing poll's name")
+        return HttpResponseBadRequest("Missing poll's name", content_type='text/plain')
     
     poll = get_object_or_404(Poll, pk=poll_name)
     proposal_list = poll.proposal_set.all()
@@ -156,3 +179,31 @@ def get_list_proposals(request):
         json.append(proposal.to_json())
     
     return JsonResponse(json, safe=False)
+
+@csrf_exempt
+def update_image(request):
+    address = request.POST.get('address')
+    form = ImageUploadForm(request.POST, request.FILES)
+    if form.is_valid():
+        image = form.cleaned_data['image']
+    else:
+        HttpResponseBadRequest("image fail", content_type='text/plain')
+
+    p = get_object_or_404(Proposal, pk=address)
+    p.image = image
+    p.save()
+
+    return HttpResponse("Updated proposal's image {}".format(address), content_type='text/plain')
+
+@csrf_exempt
+def get_image(request):
+    proposal_address = request.POST.get('address')
+    if(proposal_address == None):
+        return HttpResponseBadRequest("Missing proposal's address")
+    proposal = get_object_or_404(Proposal, pk=proposal_address)
+    try:
+        image_path = proposal.image.path
+    except ValueError:
+        return HttpResponseNotFound("Image doesn't exist", content_type='text/plain')
+    image_file = open(image_path, 'rb').read()
+    return HttpResponse(image_file, content_type="image/png")

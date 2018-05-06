@@ -24,6 +24,7 @@ class Proposal(models.Model):
     address = models.CharField(max_length=256, primary_key=True, unique=True)
     name = models.CharField(max_length=256)
     supportFor = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    image = models.ImageField(upload_to='images', null=True)
     avatar = models.CharField(max_length=256, null=True)
     description = models.CharField(max_length=1024, null=True)
     date_of_birth = models.DateField('date of birth', null=True)

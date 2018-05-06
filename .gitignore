@@ -3,3 +3,4 @@ voting/.vscode/*
 .vscode/*
 db.sqlite3
 voting/ballot/migrations/*
+voting/media/*

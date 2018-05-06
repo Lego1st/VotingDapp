@@ -36,6 +36,8 @@ response = requests.post(server_url+'create_proposal/', data=proposal_data)
 <server url>/update_proposal/
 <server url>/update_poll/
 <server url>/get_list_proposals/
+<server url>/get_image/
+<server url>/update_image
 ```
 **create_proposal**
 
@@ -48,6 +50,7 @@ Parameters:
 - `description`: str (not required).
 - `date_of_birth`: str (not required). In the format of mm/dd/yyy, ex: 01/11/1971
 - `party`: str (not required). The party this proposal belong to.
+- `image`: file (not required). The image of the proposal
 
 Return:
 - response.status_code == 400 if Missing required field/Wrong date format/Proposal's address existed.
@@ -121,9 +124,23 @@ Return:
 **get_list_proposals**
 
 Parameters:
-- `poll_name`: str (required). The address of the poll.
+- `poll_name`: str (required). The name of the poll.
 
 Return:
 - response.status_code == 400 if Missing required field
 - response.status_code == 404 if The name is not found.
 - response.status_code == 200 with a list of json objects of proposals
+
+**get_image**
+
+Parameters:
+- `address`: str (required). The address of the proposal
+
+Return:
+- a HttpResponse with `content_type=image/png` and image file.
+
+**update_image**
+
+Parameters:
+- `address`: str (required). The address of the proposal.
+- `image`: file (required). The new image.
