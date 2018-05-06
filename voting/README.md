@@ -37,7 +37,8 @@ response = requests.post(server_url+'create_proposal/', data=proposal_data)
 <server url>/update_poll/
 <server url>/get_list_proposals/
 <server url>/get_image/
-<server url>/update_image
+<server url>/update_image/
+<server url>/<proposal_address>/image/
 ```
 **create_proposal**
 
@@ -144,3 +145,6 @@ Return:
 Parameters:
 - `address`: str (required). The address of the proposal.
 - `image`: file (required). The new image.
+
+**<proposal_address>/image/**
+Query in this link will return an image

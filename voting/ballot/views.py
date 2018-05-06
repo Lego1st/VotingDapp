@@ -207,3 +207,15 @@ def get_image(request):
         return HttpResponseNotFound("Image doesn't exist", content_type='text/plain')
     image_file = open(image_path, 'rb').read()
     return HttpResponse(image_file, content_type="image/png")
+
+@csrf_exempt
+def get_image_url(request, address):
+
+    proposal = get_object_or_404(Proposal, pk=address)
+    try:
+        image_path = proposal.image.path
+    except ValueError:
+        return HttpResponseNotFound("Image doesn't exist", content_type='text/plain')
+    image_file = open(image_path, 'rb').read()
+    return HttpResponse(image_file, content_type="image/png")
+
