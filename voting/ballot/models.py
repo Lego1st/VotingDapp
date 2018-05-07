@@ -25,7 +25,6 @@ class Proposal(models.Model):
     name = models.CharField(max_length=256)
     supportFor = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     image = models.ImageField(upload_to='images', null=True)
-    avatar = models.CharField(max_length=256, null=True)
     description = models.CharField(max_length=1024, null=True)
     date_of_birth = models.DateField('date of birth', null=True)
     party = models.CharField(max_length=256, null=True)
@@ -40,9 +39,8 @@ class Proposal(models.Model):
             'poll_name': self.poll.name if(self.poll != None) else None,
             'name': self.name,
             'support_address': self.supportFor.address if(self.supportFor != None) else None,
-            'avatar': self.avatar,
             'description': self.description,
-            'date_of_birth': self.date_of_birth.strftime('%m/%d/%Y') if(self.date_of_birth != None) else None,
+            'date_of_birth': self.date_of_birth.strftime('%B/%d/%Y') if(self.date_of_birth != None) else None,
             'party': self.party
         }
 
