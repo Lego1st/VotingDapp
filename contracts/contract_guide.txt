@@ -1,0 +1,6 @@
+Authorize (A) construct
+Ballot (B) construct
+A setBallotAddress
+B setAuth
+B addVotePoll
+B addProposalToVotePoll

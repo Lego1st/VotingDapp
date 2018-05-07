@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Lego1st/VotingDapp#readme",
   "dependencies": {
+    "keythereum": "^1.0.3",
     "lite-server": "^2.3.0"
   }
 }

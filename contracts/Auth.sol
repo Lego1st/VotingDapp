@@ -1,14 +1,14 @@
-pragma solidity 0.4.23;
+pragma solidity ^0.4.17;
 // pragma experimental ABIEncoderV2;
 
 contract Authorize {
-    mapping (address => bytes32) private registeredAddress;
+    mapping (address => string) private registeredAddress;
     address public creator;
     address public ballotAddress;
     Ballot ballot;
     uint EXPECTED_ID_LENGTH = 9;
 
-    constructor() public {
+    function Authorize() public {
         creator = msg.sender;
     }
 
@@ -24,17 +24,17 @@ contract Authorize {
         ballot = Ballot(ballotAddress);
     }
 
-    function register(bytes32 ID, bytes32 state) public ballotAddressIsSet {
+    function register(string ID, bytes32 state) public ballotAddressIsSet {
         // Check for ID length.
-        // require(bytes(ID).length == EXPECTED_ID_LENGTH);
+        require(bytes(ID).length == EXPECTED_ID_LENGTH);
         // Check to make sure this address has not reg any ID.
-        // require(bytes(registeredAddress[msg.sender]).length == 0);
+        require(bytes(registeredAddress[msg.sender]).length == 0);
 
         registeredAddress[msg.sender] = ID;
         ballot.giveRightToVote(state, msg.sender);
     }
     
-    function getRegisteredID() public view returns (bytes32) {
+    function getRegisteredID() public view returns (string) {
         return registeredAddress[msg.sender];
     }
 }
@@ -111,7 +111,7 @@ contract Ballot {
         _;
     }
     
-    constructor(address _owner) public {
+    function Ballot(address _owner) public {
         owner = _owner;
     }
 
@@ -159,17 +159,17 @@ contract Ballot {
         return votePollName.length;
     }
 
-    function getVotePollInfo(uint idx) public view returns(bytes32 name, uint proposalCount, bool ended) {
-        require(idx < votePollName.length);
+    function getVotePollInfo(bytes32 pollName) public view returns(uint proposalCount, bool ended) {
+        // require(idx < votePollName.length);
 
-        VotePoll poll = votePollMap[votePollName[idx]];
-        return(poll.name, poll.proposals.length, poll.ended);
+        VotePoll storage poll = votePollMap[pollName];
+        return(poll.proposals.length, poll.ended);
     }
 
     function getVotePollProposalInfo(uint votePollIdx, uint proposalIdx) public view returns (address proposal, uint voteCount) {
         require(votePollIdx < votePollName.length);
 
-        VotePoll poll = votePollMap[votePollName[votePollIdx]];
+        VotePoll storage poll = votePollMap[votePollName[votePollIdx]];
         require(proposalIdx < poll.proposals.length);
 
         address adr = poll.proposals[proposalIdx];
@@ -189,8 +189,8 @@ contract Ballot {
 
         // Cấp quyền cho các candidate thắng ở vòng 1.
         for(uint pollIdx = 0; pollIdx < votePollName.length; pollIdx++) {
-            VotePoll poll = votePollMap[votePollName[pollIdx]];
-            for(uint i = 0; i < poll.proposals.length; i++) {
+            VotePoll storage poll = votePollMap[votePollName[pollIdx]];
+            for(uint i = 0; i < poll.winnersCount; i++) {
                 uint bestIdx = 0;
                 for(uint j = i; j < poll.proposals.length; j++) {
                     if(poll.voteCount[poll.proposals[bestIdx]] < poll.voteCount[poll.proposals[j]])
