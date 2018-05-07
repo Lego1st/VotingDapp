@@ -39,6 +39,7 @@ class Proposal(models.Model):
             'poll_name': self.poll.name if(self.poll != None) else None,
             'name': self.name,
             'support_address': self.supportFor.address if(self.supportFor != None) else None,
+            'support_name': self.supportFor.name if(self.supportFor != None) else None,
             'description': self.description,
             'date_of_birth': self.date_of_birth.strftime('%B/%d/%Y') if(self.date_of_birth != None) else None,
             'party': self.party

@@ -181,9 +181,11 @@ def get_list_proposals(request):
     poll = get_object_or_404(Poll, pk=poll_name)
     proposal_list = poll.proposal_set.all()
 
-    json = []
+    json = {'display_name': poll.display_name}
+    proposal_list_json = []
     for proposal in proposal_list:
-        json.append(proposal.to_json())
+        proposal_list_json.append(proposal.to_json())
+    json['proposal_list'] = proposal_list_json
     
     return JsonResponse(json, safe=False)
 
