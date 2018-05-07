@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity ^0.4.17;
 // pragma experimental ABIEncoderV2;
 
 contract Authorize {
@@ -8,7 +8,7 @@ contract Authorize {
     Ballot ballot;
     uint EXPECTED_ID_LENGTH = 9;
 
-    constructor() public {
+    function Authorize() public {
         creator = msg.sender;
     }
 
@@ -111,7 +111,7 @@ contract Ballot {
         _;
     }
     
-    constructor(address _owner) public {
+    function Ballot(address _owner) public {
         owner = _owner;
     }
 
