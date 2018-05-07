@@ -85,4 +85,7 @@ $(document).ready(function() {
     $("#info").on("click", function() {
         load_round(".main-view", "info.html");
     })
+    $("#update_info").on("click", function() {
+        load_round(".main-view", "update_info.html");
+    })
 })
