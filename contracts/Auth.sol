@@ -183,7 +183,7 @@ contract Ballot {
 
     function hasVoteRight() public view returns(bool) {
         //TODO: Yêu cầu address này phải thuộc về một votePoll nào đó.
-        return votePollMap[userState[msg.sender]].hasRightToVote[msg.sender];
+        return votePollMap[userState[msg.sender]].hasRightToVote[msg.sender] && !votePollMap[userState[msg.sender]].ended;
     }
 
     function hasVoted() public view returns(bool) {
