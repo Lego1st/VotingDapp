@@ -193,8 +193,8 @@ contract Ballot {
 
     function startSecondBallot() isOwner public {
         // End tất cả các votePoll hiện có.
-        for(uint i = 0; i < votePollName.length; i++) {
-            endPoll(votePollName[i]);
+        for(uint idx = 0; idx < votePollName.length; idx++) {
+            endPoll(votePollName[idx]);
         }
 
         addVotePoll(SECOND_BALLOT_POLL_NAME, 1);
