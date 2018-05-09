@@ -10,6 +10,7 @@ Ballot
     hasVoted: Mapping quản lý xem address đã vote chưa.
     voteCount: mapping lưu số vote của các proposal.
     winnersCount: uint quản lý số người thắng. Sau khi votePoll end thì sẽ chọn ra $winnersCount người thắng vào vòng sau.
+    VoteForWho: mapping lưu voter vote cho ai.
 
     constructor: cho phép set owner. Chỉ address của owner mới có thể thay đổi state của Ballot.
     
@@ -36,8 +37,9 @@ Ballot
         getVotePollProposalInfo(pollIdx, proposalIdx): lấy thông tin về proposal trong một votePoll. Thông tin trả ra là address của proposal và voteCount của proposal đó.
     
     Các hàm kiểm tra về việc vote của người dùng:
-        hasVoteRight(pollName): check xem người dùng có quyền vote vào poll này không.
-        hasVoted(pollName): check xem người dùng đã vote vào poll này chưa.
+        hasVoteRight(): check xem người dùng có quyền vote vào poll nào không. User có quyền vote vào poll khi họ đã được giveRight bởi Auth và poll đó chưa end.
+        hasVoted(): check xem người dùng đã vote vào poll của họ chưa.
+        voteFor(): trả về address của proposal mà voter đã vote.
     
     Các bước để bắt đầu vòng vote 2:
         startSecondBallot: Tự động end các votePoll hiện có. Tạo votePoll cho vòng 2 (tên là "final" và có winnersCount = 1) và lấy $winnersCount proposal có số vote cao nhất trong mỗi votePoll vòng 1 để cấp quyền được vote trong poll cuối này.
