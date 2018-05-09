@@ -64,6 +64,8 @@ contract Ballot {
     
     bytes32[] public votePollName;
     mapping(bytes32 => VotePoll) public votePollMap;
+    // Mapping lưu xem address thuộc về votePoll nào. Giới hạn một address chỉ có thể thuộc về một votePoll.
+    mapping(address => bytes32) public userState;
 
     modifier isOwner() {
         require(msg.sender == owner);
@@ -143,7 +145,10 @@ contract Ballot {
 
     function giveRightToVote(bytes32 pollName, address voter) isAuth hasThisPollName(pollName) pollNotEnded(pollName) public {
         votePollMap[pollName].hasRightToVote[voter] = true;
-    }    
+
+        // Lưu lại address này thuộc pollName nào.
+        userState[voter] = pollName;
+    }
 
     function vote(bytes32 pollName, address proposal) hasThisPollName(pollName) 
     hasThisProposal(pollName, proposal) canVote(pollName) pollNotEnded(pollName) public {
@@ -176,12 +181,14 @@ contract Ballot {
         return(adr, poll.voteCount[adr]);
     }
 
-    function hasVoteRight(bytes32 pollName) hasThisPollName(pollName) public view returns(bool) {
-        return votePollMap[pollName].hasRightToVote[msg.sender];
+    function hasVoteRight() public view returns(bool) {
+        //TODO: Yêu cầu address này phải thuộc về một votePoll nào đó.
+        return votePollMap[userState[msg.sender]].hasRightToVote[msg.sender];
     }
 
-    function hasVoted(bytes32 pollName) hasThisPollName(pollName) public view returns(bool) {
-        return votePollMap[pollName].hasVoted[msg.sender];
+    function hasVoted() public view returns(bool) {
+        //TODO: Yêu cầu address này phải thuộc về một votePoll nào đó.
+        return votePollMap[userState[msg.sender]].hasVoted[msg.sender];
     }
 
     function startSecondBallot() isOwner public {
