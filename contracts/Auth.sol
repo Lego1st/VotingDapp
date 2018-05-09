@@ -51,6 +51,8 @@ contract Ballot {
         mapping(address => bool) hasVoted;
         // Mapping lưu số vote của các proposal.
         mapping(address => uint) voteCount;
+        // Mapping lưu address vote cho proposal nào.
+        mapping(address => address) voteForWho;
         // Bool quản lý xem poll đã được kết thúc chưa.
         bool ended;
         // Uint quản lý số người thắng.
@@ -154,6 +156,7 @@ contract Ballot {
     hasThisProposal(pollName, proposal) canVote(pollName) pollNotEnded(pollName) public {
         votePollMap[pollName].hasVoted[msg.sender] = true;
         votePollMap[pollName].voteCount[proposal] += 1;
+        votePollMap[pollName].voteForWho[msg.sender] = proposal;
     }  
 
     function endPoll(bytes32 pollName) isOwner hasThisPollName(pollName) public {
@@ -189,6 +192,11 @@ contract Ballot {
     function hasVoted() public view returns(bool) {
         //TODO: Yêu cầu address này phải thuộc về một votePoll nào đó.
         return votePollMap[userState[msg.sender]].hasVoted[msg.sender];
+    }
+
+    function voteFor() public view returns(address) {
+        //TODO: Yêu cầu address này phải thuộc về một votePoll nào đó.
+        return votePollMap[userState[msg.sender]].voteForWho[msg.sender];
     }
 
     function startSecondBallot() isOwner public {
