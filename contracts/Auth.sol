@@ -8,7 +8,7 @@ contract Authorize {
     Ballot ballot;
     uint EXPECTED_ID_LENGTH = 9;
 
-    function Authorize() public {
+    constructor() public {
         creator = msg.sender;
     }
 
