@@ -16,9 +16,9 @@ Ballot
     setAuth: Set địa chỉ của Auth để Auth có thể giveRightToVote.
 
     Các hàm để tạo votePoll:
-        addVotePoll(name): thêm votepoll với tên là name
+        addVotePoll(name, winnersCount): thêm votepoll với tên là name và có winnersCount người thắng cuộc
 
-        addProposalToVotePoll(name, proposal): thêm proposal vào votepoll name.
+        addProposalToVotePoll(name, proposal): thêm proposal vào votepoll name, proposal ở đây là một address.
 
     Các hàm để quản lý việc vote:
         giveRightToVote(pollname, voter): cho phép voter vote vào pollName. Chỉ có thể được gọi bởi Auth.
@@ -40,9 +40,7 @@ Ballot
         hasVoted(pollName): check xem người dùng đã vote vào poll này chưa.
     
     Các bước để bắt đầu vòng vote 2:
-        End hết các vòng vote cũ. (hiện tại đang để cho front end tự gọi, nếu cần có thể sửa code để gọi lúc startSecondBallot).
-
-        startSecondBallot: tạo votePoll cho vòng 2 (tên là "final" và có winnersCount = 1) và lấy $winnersCount proposal có số vote cao nhất trong mỗi votePoll vòng 1 để cấp quyền được vote trong poll cuối này.
+        startSecondBallot: Tự động end các votePoll hiện có. Tạo votePoll cho vòng 2 (tên là "final" và có winnersCount = 1) và lấy $winnersCount proposal có số vote cao nhất trong mỗi votePoll vòng 1 để cấp quyền được vote trong poll cuối này.
 
         Sau đó thì sửa poll cuối này như các poll khác, cụ thể:
         

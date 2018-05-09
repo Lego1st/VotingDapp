@@ -192,6 +192,11 @@ contract Ballot {
     }
 
     function startSecondBallot() isOwner public {
+        // End tất cả các votePoll hiện có.
+        for(uint i = 0; i < votePollName.length; i++) {
+            endPoll(votePollName[i]);
+        }
+
         addVotePoll(SECOND_BALLOT_POLL_NAME, 1);
 
         // Cấp quyền cho các candidate thắng ở vòng 1.
