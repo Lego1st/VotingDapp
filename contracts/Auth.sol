@@ -10,6 +10,8 @@ contract Authorize {
 
     constructor() public {
         creator = msg.sender;
+        registeredAddress[0x627bd61ce90284a741a654a75d03a1b8319a75d7] = "111111111";
+        // ballot.
     }
 
     modifier ballotAddressIsSet() {
@@ -117,6 +119,11 @@ contract Ballot {
     
     constructor(address _owner) public {
         owner = _owner;
+        addVotePoll('Cal', 1);
+        addVotePoll('Flo', 1);
+        addVotePoll('Tex', 1);
+        giveRightToVote('Cal', 0x627bd61ce90284a741a654a75d03a1b8319a75d7);
+        // addProposalToVotePoll('Cal', '');
     }
 
     // Set địa chỉ của Auth để Auth có thể giveRightToVote.

@@ -169,3 +169,7 @@ h1, h2, h3 {
 .elector .selection input[type=radio]:checked ~ label {
   background-color: #f1592a;
 }
+
+.adminbtn {
+  margin-top: 20px;
+}

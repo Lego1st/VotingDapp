@@ -40,16 +40,27 @@ function init() {
             status = '<span style="color:green">Registered<span>';
         else 
             status = '<span style="color:red">Unregistered<span>';
+        // var poll = $("input[name='pollname']");
+
+        var poll = $("#pollname");
+        for (i in pollnames) {
+            poll.append('<option value="' + pollnames[i].name + '">' + pollnames[i].display + '</option>');
+        }
         $("#status").html(status);
         $("#elector-form").submit(function(event) {
             if (registered) {
                 $("#warning1").show();
             } else {
-                var dat = $(this).serializeArray();
-                var id = dat[0].value;
-                var state = dat[1].value;
+                var id = document.getElementsByName("id")[0].value;
+                var poll = document.getElementById("pollname");
+                var pollname = poll.options[poll.selectedIndex].value;
+                pollnameHex = '0x' + convertToHex(pollname);
+                // var dat = $(this).serializeArray();
+                // console.log(data[0])
+                // var id = dat[0].value;
+                // var state = dat[1].value;
 
-                authInstance.register(id, state, function(err, data) {
+                authInstance.register(id, pollnameHex, function(err, data) {
                     console.log(err);
                 });
 

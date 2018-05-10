@@ -105,6 +105,12 @@ def get_poll(request):
     return JsonResponse(poll.to_json())
 
 @csrf_exempt
+def get_all_poll(request):
+    all_poll = Poll.objects.all();
+    poll_list = {'poll_list' : [poll.to_json() for poll in all_poll]}
+    return JsonResponse(poll_list)
+
+@csrf_exempt
 def update_proposal(request):
 
     address = request.POST.get('address')
