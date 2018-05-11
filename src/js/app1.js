@@ -1,6 +1,4 @@
 var web3Provider;
-// var ABI;
-// var ballot_add;
 var ballotInstance;
 var authInstance;
 function load_round(loaddiv, toload) {
@@ -40,7 +38,6 @@ function init() {
             status = '<span style="color:green">Registered<span>';
         else 
             status = '<span style="color:red">Unregistered<span>';
-        // var poll = $("input[name='pollname']");
 
         var poll = $("#pollname");
         for (i in pollnames) {
@@ -55,21 +52,11 @@ function init() {
                 var poll = document.getElementById("pollname");
                 var pollname = poll.options[poll.selectedIndex].value;
                 pollnameHex = '0x' + convertToHex(pollname);
-                // var dat = $(this).serializeArray();
-                // console.log(data[0])
-                // var id = dat[0].value;
-                // var state = dat[1].value;
 
                 authInstance.register(id, pollnameHex, function(err, data) {
                     console.log(err);
                 });
 
-                // var res = register(id, state);
-                // if (res) {
-                //     $("#notice").show();
-                // } else {
-                //     $("#warning2").show();
-                // }
             }
             event.preventDefault();
         });

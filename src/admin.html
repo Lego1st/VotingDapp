@@ -24,15 +24,19 @@
                 <span class="col-xs-4">
                     <input class="form-control" type="text" name="pollname" placeholder="Poll name">
                     <input class="form-control" type="text" name="displayname" placeholder="Display name">
-                    <button class="btn btn-default viewbtn adminbtn"> New poll </button>
+                    <button class="btn btn-default viewbtn adminbtn" id="newpoll"> New poll </button>
                 </span>
                 <span class="col-xs-4">
                     <select id="adminpollname" class="form-control form-control-lg">
                     </select>
+                    <ul style="list-style: none" id="proposalFromPoll">
+                        <h4> Proposals: </h4>
+                    </ul>
                 </span>
                 <span class="col-xs-4">
+                    <input class="form-control" type="text" name="proposalName" placeholder="Proposal's name">
                     <input class="form-control" type="text" name="proposalAddress" placeholder="Proposal's address">
-                    <button class="btn btn-default viewbtn adminbtn"> New proposal </button>
+                    <button class="btn btn-default viewbtn adminbtn" id="newproposal"> New proposal </button>
                 </span>
             </div>
         </div>

@@ -173,3 +173,20 @@ h1, h2, h3 {
 .adminbtn {
   margin-top: 20px;
 }
+
+#candidate_list {
+  margin-top: 20px;
+}
+
+#proposalFromPoll {
+  margin-top: 30px;
+}
+
+span { 
+  display:block;
+  word-wrap:break-word;
+}
+
+.form-control {
+  margin: 5px 5px 5px 5px;
+}
