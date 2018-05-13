@@ -101,8 +101,8 @@ contract Ballot {
         _;
     }
 
-    modifier isAuth() {
-        require(msg.sender == auth);
+    modifier isAuthOrOwner() {
+        require(msg.sender == auth || msg.sender == owner);
         _;
     }
 
@@ -151,7 +151,7 @@ contract Ballot {
         votePollMap[pollName].proposals.push(proposalAddress);
     }
 
-    function giveRightToVote(bytes32 pollName, address voter) isAuth hasThisPollName(pollName) pollNotEnded(pollName) public {
+    function giveRightToVote(bytes32 pollName, address voter) isAuthOrOwner hasThisPollName(pollName) pollNotEnded(pollName) public {
         votePollMap[pollName].hasRightToVote[voter] = true;
 
         // Lưu lại address này thuộc pollName nào.
@@ -235,4 +235,3 @@ contract Ballot {
         }
     }
 }   
-

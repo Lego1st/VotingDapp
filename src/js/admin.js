@@ -37,7 +37,14 @@ $(document).ready(function() {
         });
     });
     $("#endElection").on("click", function() {
-        alert('Election ENDED!');
+        var polHex = '0x' + convertToHex("final");
+        ballotInstance.endPoll(polHex, function(err, data) {
+            if(!err) {
+                alert('Election ENDED!');
+            } else {
+                console.log(err);
+            }
+        })
     })
 	$("#editbtn").on("click", function() {
 		$("#adminOption").hide();

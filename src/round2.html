@@ -15,22 +15,34 @@
             <span class="letter" data-letter="VO"> VO </span>
             <span class="letter" data-letter="SYS"> SYS </span>
             <h1> Who will be the president !</h1>
-            <span class="round1start"><h3> Wait until the end of round 1 to vote ...</h3></span>
         </div>
         <div class = "container-fluid my-container">
-            <div class="round1end" class="row"> 
-                <div class="col-xs-3 side-bar verticalline">
-                    <ul style="list-style: none">
-                        <li><a href="#"><span id="info-pre"> Informations </span></a></li>
-                        <li><a href="#"><span id="vote-pre" hidden> Vote </span></a></li>
-                    </ul>
-                </div>
-                <div class="col-xs-6 ">
-                    <div class = "main-view">
-                    <i>Voteground for president round here</i>
+            <div class="row">
+                <span class="col-xs-3"></span>
+                <span class="col-xs-6">
+                    <select class="form-control" id="leaderSelect">
+                    </select>
+                </span>
+                <span class="col-xs-3"></span>
+            </div>
+            <div class="row">
+                <span class="col-xs-3"></span>
+                <span class="col-xs-6">
+                    <div id="proposalFromPoll">
+                        <!-- <div class="col-xs-6" id="proposalSide">
+                            <h3>Donald Trump</h3>
+                        </div>
+                        <div class="col-xs-6" id="voteSide">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width:40%">
+                                  <span class="sr-only">70% Complete</span>
+                                </div>
+                              </div>
+                        </div> -->
                     </div>
-                </div>
-            </div>      
+                </span>
+                <span class="col-xs-3"></span>
+            </div>
         </div>
     </body>
 </html>

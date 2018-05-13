@@ -20,13 +20,13 @@ function initContract() {
 
 
 function init() {
-    if(isEndedRound1()) {
-        $(".round1end").show();
-        $(".round1start").hide();
-    } else {
-        $(".round1end").hide();
-        $(".round1start").show();
-    }
+    // if(isEndedRound1()) {
+    //     $(".round1end").show();
+    //     $(".round1start").hide();
+    // } else {
+    //     $(".round1end").hide();
+    //     $(".round1start").show();
+    // }
 
     var status = "";
 
