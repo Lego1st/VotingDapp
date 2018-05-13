@@ -10,8 +10,6 @@ contract Authorize {
 
     constructor() public {
         creator = msg.sender;
-        registeredAddress[0x627bd61ce90284a741a654a75d03a1b8319a75d7] = "111111111";
-        // ballot.
     }
 
     modifier ballotAddressIsSet() {
@@ -63,6 +61,7 @@ contract Ballot {
 
     bytes32 SECOND_BALLOT_POLL_NAME = "final";
 
+    bool public isFinale = false;
     address public owner;
     address public auth;
     
@@ -119,10 +118,10 @@ contract Ballot {
     
     constructor(address _owner) public {
         owner = _owner;
-        addVotePoll('Cal', 1);
-        addVotePoll('Flo', 1);
-        addVotePoll('Tex', 1);
-        giveRightToVote('Cal', 0x627bd61ce90284a741a654a75d03a1b8319a75d7);
+        // addVotePoll('Cal', 1);
+        // addVotePoll('Flo', 1);
+        // addVotePoll('Tex', 1);
+        // addProposalToVotePoll('Cal', 0x627bd61ce90284a741a654a75d03a1b8319a75d7);
         // addProposalToVotePoll('Cal', '');
     }
 
@@ -174,17 +173,17 @@ contract Ballot {
         return votePollName.length;
     }
 
-    function getVotePollInfo(bytes32 pollName) public view returns(uint proposalCount, bool ended) {
+    function getVotePollInfo(bytes32 pollName) public view returns(uint proposalCount, bool ended, uint winnersCount) {
         // require(idx < votePollName.length);
 
         VotePoll storage poll = votePollMap[pollName];
-        return(poll.proposals.length, poll.ended);
+        return(poll.proposals.length, poll.ended, poll.winnersCount);
     }
 
-    function getVotePollProposalInfo(uint votePollIdx, uint proposalIdx) public view returns (address proposal, uint voteCount) {
-        require(votePollIdx < votePollName.length);
+    function getVotePollProposalInfo(bytes32 pollName, uint proposalIdx) public view returns (address proposal, uint voteCount) {
+        // require(votePollIdx < votePollName.length);
 
-        VotePoll storage poll = votePollMap[votePollName[votePollIdx]];
+        VotePoll storage poll = votePollMap[pollName];
         require(proposalIdx < poll.proposals.length);
 
         address adr = poll.proposals[proposalIdx];
@@ -208,14 +207,15 @@ contract Ballot {
 
     function startSecondBallot() isOwner public {
         // End tất cả các votePoll hiện có.
-        for(uint idx = 0; idx < votePollName.length; idx++) {
+        for(uint idx = 1; idx < votePollName.length; idx++) {
             endPoll(votePollName[idx]);
         }
 
-        addVotePoll(SECOND_BALLOT_POLL_NAME, 1);
+        isFinale = true;
+        // addVotePoll(SECOND_BALLOT_POLL_NAME, 1);
 
         // Cấp quyền cho các candidate thắng ở vòng 1.
-        for(uint pollIdx = 0; pollIdx < votePollName.length; pollIdx++) {
+        for(uint pollIdx = 1; pollIdx < votePollName.length; pollIdx++) {
             VotePoll storage poll = votePollMap[votePollName[pollIdx]];
             for(uint i = 0; i < poll.winnersCount; i++) {
                 uint bestIdx = 0;

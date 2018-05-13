@@ -19,7 +19,15 @@
             Status: <span id="status"> </span>
         </div>
         <div class = "container-fluid my-container">
-            <a class="btn btn-default viewbtn" id="editbtn"> Edit ballots </a>
+            <div class="row" id="adminOption">
+                <span class="col-xs-4"></span> 
+                <span class="col-xs-4"> 
+                    <a class="btn btn-default viewbtn" id="editbtn" style="margin-bottom: 8px"> Edit ballots </a>
+                    <a class="btn btn-default viewbtn btn-warning" id="start2ndRound" style="margin-bottom: 8px"> Start President Round </a>
+                    <a class="btn btn-default viewbtn btn-danger" id="endElection" style="margin-bottom: 8px"> END ELECTION! </a> 
+                </span>
+                <span class="col-xs-4"></span>
+            </div>
             <div class="row" id="adminscreen" hidden>
                 <span class="col-xs-4">
                     <input class="form-control" type="text" name="pollname" placeholder="Poll name">

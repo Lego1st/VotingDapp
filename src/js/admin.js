@@ -31,8 +31,16 @@ function loadCandidateInfo(state) {
 }
 
 $(document).ready(function() {
+    $("#start2ndRound").on("click", function() {
+        ballotInstance.startSecondBallot(function(err, data) {
+            alert('Elector round ended. President round start');
+        });
+    });
+    $("#endElection").on("click", function() {
+        alert('Election ENDED!');
+    })
 	$("#editbtn").on("click", function() {
-		$(this).hide();
+		$("#adminOption").hide();
 		$("#adminscreen").show();
 
 		var poll = $("#adminpollname");
