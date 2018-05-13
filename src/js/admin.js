@@ -15,7 +15,7 @@ function loadCandidateInfo(state) {
             // console.log(data);
             message = data['message']
             if(message == 'ok') {
-            	data = data['data']
+            	data = data['data'];
 	        	var proposalFromPoll = $("#proposalFromPoll");
 	        	proposalFromPoll.html("");
 	        	proposal_list = data['proposal_list']
@@ -63,13 +63,21 @@ $(document).ready(function() {
                 processData:false,        // To send DOMDocument or non processed data file it is set to false
                 success: function(data) {   // A function to be called if request succeeds
                     console.log(data['message']);
+                    // console.log(account);
+                    var pollHex = '0x' + convertToHex(pollname);
+                        // var pollname = convertFromHex(data.substr(2,).replace(/0+$/i, ''));
+                        // var pollHex = data.replace(/0+$/i, '');
+                    ballotInstance.addVotePoll(pollHex, 1, function(err, data) {
+                        console.log(err);
+                        console.log(data);
+                        if(!alert('Sucessful poll added')){window.location.reload();}
+                    });
                 },
                 error: function(request, status, error) {
                     // console.log(error);
                 },
                 
             });
-            window.location.reload();
         })
 
         $("#newproposal").on("click", function() {
@@ -91,13 +99,19 @@ $(document).ready(function() {
                 processData:false,        // To send DOMDocument or non processed data file it is set to false
                 success: function(data) {   // A function to be called if request succeeds
                     console.log(data['message']);
+                    var pollHex = '0x' + convertToHex(currentPollName);
+                    ballotInstance.addProposalToVotePoll(pollHex, proposalAddress, function(err, data) {
+                        console.log(err);
+                        console.log(data);
+                        if(!alert("Successfully proposal added")) {window.location.reload()};
+                    })
                 },
                 error: function(request, status, error) {
                     // console.log(error);
                 },
                 
             });
-            window.location.reload();
+            // window.location.reload();
         });
 	})
 })

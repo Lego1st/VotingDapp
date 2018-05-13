@@ -153,6 +153,7 @@ def update_proposal(request):
             return JsonResponse({'message': 'Proposal does not exist'})
     else:
         support_for = None
+        
     if(date_of_birth != None and date_of_birth != ''):
         try:
             date_of_birth = datetime.strptime(date_of_birth, '%B/%d/%Y')

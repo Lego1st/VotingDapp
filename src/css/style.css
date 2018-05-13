@@ -141,11 +141,11 @@ h1, h2, h3 {
   margin: 0 auto;
 }
 
-.elector .selection {
+#elector .selection {
   margin-bottom: 1em;
 }
 
-.elector .selection label {
+#elector .selection label {
   display: inline-block;
   width:8em;
   height:4em;
@@ -158,15 +158,15 @@ h1, h2, h3 {
   cursor: pointer;
 }
 
-.elector .selection label:hover {
+#elector .selection label:hover {
   background-color: #5fc0dc;
 }
 
-.elector .selection input[type=radio] {
+#elector .selection input[type=radio] {
   display: none;
 }
 
-.elector .selection input[type=radio]:checked ~ label {
+#elector .selection input[type=radio]:checked ~ label {
   background-color: #f1592a;
 }
 
