@@ -31,7 +31,7 @@ function loadPollName() {
     for (i in pollnames) {
         poll.append('<option value="' + pollnames[i].name + '">' + pollnames[i].display + '</option>');
     }
-    loadCandidateInfo('Cali');
+    loadCandidateInfo(poll.find(":selected").val());
 }
 
 
