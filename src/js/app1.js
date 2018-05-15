@@ -30,14 +30,11 @@ function init() {
 
     var status = "";
 
-    authInstance.getRegisteredID(function(err, data) {
-        registered = true
-        if (data == "")
-            registered = false
+    ballotInstance.hasVoteRight(function(err, registered) {
         if(registered) 
-            status = '<span style="color:green">Registered<span>';
+            status = '<span style="color:green">You have right to vote<span>';
         else 
-            status = '<span style="color:red">Unregistered<span>';
+            status = '<span style="color:red">Not illegal to vote<span>';
 
         var poll = $("#pollname");
         for (i in pollnames) {

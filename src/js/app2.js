@@ -94,6 +94,7 @@ $(document).ready(function() {
     	if(finale == true) {
     		ballotInstance.votePollMap("0x66696e616c", function(err, data) {
     			var isElectionEnd = data[1];
+    			isElectionEnd = false;	
     			if(isElectionEnd) {
     				congratulation();
     			} else {
