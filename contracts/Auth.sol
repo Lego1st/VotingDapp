@@ -17,11 +17,26 @@ contract Authorize {
         _;
     }
 
+    modifier isCreator() {
+        require(msg.sender == creator);
+        _;
+    }
+
     function setBallotAddress(address ballotAdr) public {
         require(msg.sender == creator);
 
         ballotAddress = ballotAdr;
         ballot = Ballot(ballotAddress);
+    }
+
+    function register(string ID, bytes32 state, address voter) public isCreator ballotAddressIsSet {
+        // Check for ID length.
+        require(bytes(ID).length == EXPECTED_ID_LENGTH);
+        // Check to make sure this address has not reg any ID.
+        require(bytes(registeredAddress[voter]).length == 0);
+
+        registeredAddress[voter] = ID;
+        ballot.giveRightToVote(state, voter);
     }
 
     function register(string ID, bytes32 state) public ballotAddressIsSet {
@@ -61,7 +76,6 @@ contract Ballot {
 
     bytes32 SECOND_BALLOT_POLL_NAME = "final";
 
-    bool TEST_MODE = false;
     bool public isFinale = false;
     address public owner;
     address public auth;
@@ -108,7 +122,7 @@ contract Ballot {
     }
 
     modifier canVote(bytes32 pollName) {
-        require((TEST_MODE == true && msg.sender == owner) || votePollMap[pollName].hasRightToVote[msg.sender] == true);
+        require(votePollMap[pollName].hasRightToVote[msg.sender] == true);
         _;
     }
 
@@ -124,11 +138,6 @@ contract Ballot {
         // addVotePoll('Tex', 1);
         // addProposalToVotePoll('Cal', 0x627bd61ce90284a741a654a75d03a1b8319a75d7);
         // addProposalToVotePoll('Cal', '');
-    }
-
-    // Set TEST_MODE, true cho phép owner gọi mọi hàm.
-    function setTestMode(bool _mode) isOwner public {
-        TEST_MODE = _mode;
     }
 
     // Set địa chỉ của Auth để Auth có thể giveRightToVote.
@@ -169,6 +178,13 @@ contract Ballot {
         votePollMap[pollName].hasVoted[msg.sender] = true;
         votePollMap[pollName].voteCount[proposal] += 1;
         votePollMap[pollName].voteForWho[msg.sender] = proposal;
+    }  
+
+    function vote(bytes32 pollName, address proposal, address voter) hasThisPollName(pollName) 
+    hasThisProposal(pollName, proposal) isOwner pollNotEnded(pollName) public {
+        votePollMap[pollName].hasVoted[voter] = true;
+        votePollMap[pollName].voteCount[proposal] += 1;
+        votePollMap[pollName].voteForWho[voter] = proposal;
     }  
 
     function endPoll(bytes32 pollName) isOwner hasThisPollName(pollName) public {
