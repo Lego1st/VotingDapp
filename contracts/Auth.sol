@@ -131,8 +131,8 @@ contract Ballot {
         _;
     }
     
-    constructor(address _creator) public {
-        creator = _creator;
+    constructor() public {
+        creator = msg.sender;
         // addVotePoll('Cal', 1);
         // addVotePoll('Flo', 1);
         // addVotePoll('Tex', 1);
