@@ -77,7 +77,7 @@ contract Ballot {
     bytes32 SECOND_BALLOT_POLL_NAME = "final";
 
     bool public isFinale = false;
-    address public owner;
+    address public creator;
     address public auth;
     
     bytes32[] public votePollName;
@@ -85,8 +85,8 @@ contract Ballot {
     // Mapping lưu xem address thuộc về votePoll nào. Giới hạn một address chỉ có thể thuộc về một votePoll.
     mapping(address => bytes32) public userState;
 
-    modifier isOwner() {
-        require(msg.sender == owner);
+    modifier isCreator() {
+        require(msg.sender == creator);
         _;
     }
 
@@ -117,7 +117,7 @@ contract Ballot {
     }
 
     modifier isAuthOrOwner() {
-        require(msg.sender == auth || msg.sender == owner);
+        require(msg.sender == auth || msg.sender == creator);
         _;
     }
 
@@ -131,8 +131,8 @@ contract Ballot {
         _;
     }
     
-    constructor(address _owner) public {
-        owner = _owner;
+    constructor(address _creator) public {
+        creator = _creator;
         // addVotePoll('Cal', 1);
         // addVotePoll('Flo', 1);
         // addVotePoll('Tex', 1);
@@ -145,7 +145,7 @@ contract Ballot {
         auth = _auth;
     }
 
-    function addVotePoll(bytes32 pollName, uint winnersCount) isOwner public {
+    function addVotePoll(bytes32 pollName, uint winnersCount) isCreator public {
         // Kiểm tra xem tên này đã dùng chưa.
         for(uint i = 0; i < votePollName.length; i++) {
             if (keccak256(votePollName[i]) == keccak256(pollName))
@@ -156,7 +156,7 @@ contract Ballot {
         votePollMap[pollName] = VotePoll({name: pollName, proposals: new address[](0), ended: false, winnersCount: winnersCount});
     }
 
-    function addProposalToVotePoll(bytes32 pollName, address proposalAddress) isOwner hasThisPollName(pollName) public {
+    function addProposalToVotePoll(bytes32 pollName, address proposalAddress) isCreator hasThisPollName(pollName) public {
         // Kiểm tra xem address này đã được add chưa.
         for(uint i = 0; i < votePollMap[pollName].proposals.length; i++) {
             if (votePollMap[pollName].proposals[i] == proposalAddress)
@@ -181,13 +181,13 @@ contract Ballot {
     }  
 
     function vote(bytes32 pollName, address proposal, address voter) hasThisPollName(pollName) 
-    hasThisProposal(pollName, proposal) isOwner pollNotEnded(pollName) public {
+    hasThisProposal(pollName, proposal) isCreator pollNotEnded(pollName) public {
         votePollMap[pollName].hasVoted[voter] = true;
         votePollMap[pollName].voteCount[proposal] += 1;
         votePollMap[pollName].voteForWho[voter] = proposal;
     }  
 
-    function endPoll(bytes32 pollName) isOwner hasThisPollName(pollName) public {
+    function endPoll(bytes32 pollName) isCreator hasThisPollName(pollName) public {
         votePollMap[pollName].ended = true;
     }
 
@@ -227,7 +227,7 @@ contract Ballot {
         return votePollMap[userState[msg.sender]].voteForWho[msg.sender];
     }
 
-    function startSecondBallot() isOwner public {
+    function startSecondBallot() isCreator public {
         // End tất cả các votePoll hiện có.
         for(uint idx = 1; idx < votePollName.length; idx++) {
             endPoll(votePollName[idx]);
