@@ -61,6 +61,7 @@ contract Ballot {
 
     bytes32 SECOND_BALLOT_POLL_NAME = "final";
 
+    bool TEST_MODE = false;
     bool public isFinale = false;
     address public owner;
     address public auth;
@@ -107,7 +108,7 @@ contract Ballot {
     }
 
     modifier canVote(bytes32 pollName) {
-        require(votePollMap[pollName].hasRightToVote[msg.sender] == true);
+        require((TEST_MODE == true && msg.sender == owner) || votePollMap[pollName].hasRightToVote[msg.sender] == true);
         _;
     }
 
@@ -123,6 +124,11 @@ contract Ballot {
         // addVotePoll('Tex', 1);
         // addProposalToVotePoll('Cal', 0x627bd61ce90284a741a654a75d03a1b8319a75d7);
         // addProposalToVotePoll('Cal', '');
+    }
+
+    // Set TEST_MODE, true cho phép owner gọi mọi hàm.
+    function setTestMode(bool _mode) isOwner public {
+        TEST_MODE = _mode;
     }
 
     // Set địa chỉ của Auth để Auth có thể giveRightToVote.
