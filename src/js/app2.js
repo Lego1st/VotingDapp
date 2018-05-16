@@ -55,16 +55,28 @@ function loadLeaderBoardInfo(pollname, cb) {
             	data = data['data'];
 	        	var proposal_list = data['proposal_list']
 	        	var votes = [];
+	        	var addrs = [];
 	        	for(let i=0; i < proposal_list.length; i++) {
 	        		var polHex = '0x' + convertToHex(pollname);
 	        		var n = proposal_list.length;
 	        		
 	        		ballotInstance.getVotePollProposalInfo(polHex, i, function(err, data) {
+	        			console.log(data);
 	        			votes[i] = data[1].toString();
+	        			addrs[i] = data[0];
 	        			if(votes.length == n) {
 	        				softmax_votes = softmax(votes);
-	        				cb(proposal_list, softmax_votes);
-	        			}
+	        				var new_proposal_list = [];
+	        				for (let j = 0; j < n; ++j) {
+	        					for (let k = 0; k < n; ++k) {
+	        						if(proposal_list[k]['address'] == addrs[j]) {
+	        							new_proposal_list[j] = proposal_list[k];
+	        							break;
+	        						}
+	        					}
+	        				}
+	        				cb(new_proposal_list, softmax_votes);
+	        			} 
 	        		})
 	        	}
 	        }
@@ -94,7 +106,6 @@ $(document).ready(function() {
     	if(finale == true) {
     		ballotInstance.votePollMap("0x66696e616c", function(err, data) {
     			var isElectionEnd = data[1];
-    			isElectionEnd = false;	
     			if(isElectionEnd) {
     				congratulation();
     			} else {

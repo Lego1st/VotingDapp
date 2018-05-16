@@ -29,7 +29,7 @@ contract Authorize {
         ballot = Ballot(ballotAddress);
     }
 
-    function register(string ID, bytes32 state, address voter) public isCreator ballotAddressIsSet {
+    function registerTest(string ID, bytes32 state, address voter) public isCreator ballotAddressIsSet {
         // Check for ID length.
         require(bytes(ID).length == EXPECTED_ID_LENGTH);
         // Check to make sure this address has not reg any ID.
@@ -180,7 +180,7 @@ contract Ballot {
         votePollMap[pollName].voteForWho[msg.sender] = proposal;
     }  
 
-    function vote(bytes32 pollName, address proposal, address voter) hasThisPollName(pollName) 
+    function voteTest(bytes32 pollName, address proposal, address voter) hasThisPollName(pollName) 
     hasThisProposal(pollName, proposal) isCreator pollNotEnded(pollName) public {
         votePollMap[pollName].hasVoted[voter] = true;
         votePollMap[pollName].voteCount[proposal] += 1;
@@ -228,6 +228,16 @@ contract Ballot {
     }
 
     function startSecondBallot() isCreator public {
+        // Hack: swap Final ballot to first position.
+        for(uint k = 1; k < votePollName.length; k++) {
+            if (votePollName[k] == SECOND_BALLOT_POLL_NAME) {
+                bytes32 tmp1 = votePollName[k];
+                votePollName[k] = votePollName[0];
+                votePollName[0] = tmp1;
+                break;
+            }
+        }
+
         // End tất cả các votePoll hiện có.
         for(uint idx = 1; idx < votePollName.length; idx++) {
             endPoll(votePollName[idx]);
